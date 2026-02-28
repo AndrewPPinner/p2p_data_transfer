@@ -3,6 +3,7 @@ mod codec;
 mod connection;
 mod connection_manager_ui;
 mod handlers;
+mod icons;
 mod word_list;
 
 use std::env;

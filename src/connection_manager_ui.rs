@@ -1,12 +1,16 @@
-use egui::{Pos2, Vec2};
+use egui::{Button, Pos2, Vec2, load::SizedTexture};
 
-use crate::APP_ID;
+use crate::{
+    APP_ID,
+    icons::{AppIcons, Icons},
+};
 
 #[derive(Default)]
 pub struct AppState {
     pub active_connections: Vec<(bool, String)>,
     pub had_focus: bool,
     pub new_connection: String,
+    pub icons: AppIcons,
 }
 
 impl eframe::App for AppState {
@@ -19,13 +23,26 @@ impl eframe::App for AppState {
             return focused;
         });
 
+        let trash_icon = self
+            .icons
+            .trash_icon
+            .get_or_insert_with(|| Icons::TrashIcon.get_icon(ctx));
+
         if focused == Some(false) && self.had_focus {
             ctx.send_viewport_cmd(egui::ViewportCommand::Close);
         }
 
         egui::CentralPanel::default().show(ctx, |ui| {
             for connection in &mut self.active_connections {
-                ui.checkbox(&mut connection.0, &connection.1);
+                ui.horizontal(|row| {
+                    row.checkbox(&mut connection.0, &connection.1);
+                    if row
+                        .add(Button::image(SizedTexture::from_handle(trash_icon)).frame(false))
+                        .clicked()
+                    {
+                        println!("Delete Connection");
+                    }
+                });
             }
 
             ui.add_space(10.0);
